@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     "rest_framework_simplejwt",
+    'rest_framework.authtoken',
 
     'users_api',
 ]
@@ -139,6 +140,11 @@ AUTH_USER_MODEL = 'users_api.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/users_api/'
+
+AUTHENTICATION_BACKENDS = (
+    'users_api.auth_backend.PhoneAuth',
+)
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

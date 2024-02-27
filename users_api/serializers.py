@@ -1,21 +1,28 @@
-from random import randint
-
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from users_api.models import User
+from users_api.validators import ReferralCodeValidator, PhoneNumberValidator
 
 
 class UserSerializer(ModelSerializer):
-    authorization_code = serializers.SerializerMethodField()
-
-    def get_authorization_code(self, obj):
-        return randint(1000, 9999)
 
     class Meta:
         model = User
-        fields = ['username', 'phone_number', 'password', 'authorization_code']
+        fields = ['phone_number', 'authorization_code']
+        validators = [PhoneNumberValidator('phone_number'), ]
+
+
+class UserLoginSerializer(serializers.Serializer):
+    """
+    This serializer defines two fields for authentication:
+      * username
+      * password.
+    It will try to authenticate the user with when validated.
+    """
+    phone_number = serializers.CharField()
+    authorization_code = serializers.CharField()
 
 
 class UserPhoneNumberSerializer(ModelSerializer):
@@ -29,20 +36,21 @@ class UserProfileSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'phone_number', 'referral_code', 'referred_by', 'invite_code', 'invited_users']
+        fields = ['id', 'phone_number', 'referral_code', 'referred_by', 'invite_code', 'invited_users']
+
 
 
 class UserUpdateSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['referred_by']
+        fields = ['referral_code']
+        validators = [ReferralCodeValidator('referral_code'), ]
 
-
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        token['username'] = user.username
-        return token
+# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#
+#     @classmethod
+#     def get_token(cls, user):
+#         token = super().get_token(user)
+#         # token['username'] = user.phone_number
+#         return token
