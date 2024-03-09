@@ -4,7 +4,7 @@ from users_api.models import User
 
 
 class PhoneAuth:
-
+    """ Authorization backend class for custom user authentication """
     def authenticate(self, request, username=None, password=None):
         try:
             user = User.objects.get(phone_number=username)

@@ -1,7 +1,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 class User(AbstractUser):
+    """
+    Model for custom user with
+    'phone_number' as USERNAME_FIELD and
+    'authorization_code' as a password
+    """
     USERNAME_FIELD = "phone_number"
 
     username = models.CharField(max_length=30, blank=True, null=True, unique=False)

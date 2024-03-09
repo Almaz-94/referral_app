@@ -7,7 +7,7 @@ from users_api.validators import ReferralCodeValidator, PhoneNumberValidator
 
 
 class UserSerializer(ModelSerializer):
-
+    """ Serializer for User creation """
     class Meta:
         model = User
         fields = ['phone_number', 'authorization_code']
@@ -17,8 +17,8 @@ class UserSerializer(ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
     """
     This serializer defines two fields for authentication:
-      * username
-      * password.
+      * phone_number
+      * authorization_code.
     It will try to authenticate the user with when validated.
     """
     phone_number = serializers.CharField()
@@ -26,12 +26,14 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class UserPhoneNumberSerializer(ModelSerializer):
+    """ This serializer is used for displaying invited_users in user's profile """
     class Meta:
         model = User
         fields = ['phone_number']
 
 
 class UserProfileSerializer(ModelSerializer):
+    """ Serializer for retrieving user's profile """
     invited_users = UserPhoneNumberSerializer(source='user_set', many=True, read_only=True)
 
     class Meta:
@@ -41,16 +43,9 @@ class UserProfileSerializer(ModelSerializer):
 
 
 class UserUpdateSerializer(ModelSerializer):
-
+    """ Serializer for updating user's referral_code in his profile """
     class Meta:
         model = User
         fields = ['referral_code']
         validators = [ReferralCodeValidator('referral_code'), ]
 
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-#         # token['username'] = user.phone_number
-#         return token

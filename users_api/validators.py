@@ -5,6 +5,7 @@ from users_api.models import User
 
 
 class ReferralCodeValidator:
+    """ Validator for checking 'referral_code' existence in database"""
     def __init__(self, referral_code):
         self.referral_code = referral_code
 
@@ -16,6 +17,7 @@ class ReferralCodeValidator:
 
 
 class PhoneNumberValidator:
+    """ Phone number validator """
     def __init__(self, phone_number):
         self.phone_number = phone_number
 
