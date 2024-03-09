@@ -88,6 +88,9 @@ class UserUpdateAPIView(UpdateAPIView):
         if instance.referral_code:
             message = {'message': 'You cannot change your referral code twice'}
             raise ValidationError(message)
+        elif instance.invite_code == self.request.data.get("referral_code"):
+            message = {'message': 'You cannot set your invite code as your referral code'}
+            raise ValidationError(message)
         instance.referred_by = User.objects.get(invite_code=self.request.data.get("referral_code"))
         instance.referral_code = self.request.data.get("referral_code")
         instance.save()
