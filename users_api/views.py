@@ -39,11 +39,11 @@ class UserCreateAPIView(CreateAPIView):
         if existing_user:
             existing_user.authorization_code = random.randint(1000, 9999)
             existing_user.save()
-            response = {'phone_number': existing_user.phone_number,
+            response = {'user_id': existing_user.pk,
+                        'phone_number': existing_user.phone_number,
                         'authorization_code': existing_user.authorization_code}
         else:
             response = super().create(request, *args, **kwargs).data
-
         time.sleep(2)
         return Response({'message': 'Proceed to http://localhost:8000/api/users/token/ '
                                     'Your authorization code is sent via message to your phone_number. ',
@@ -62,11 +62,9 @@ class UserTokenAPIView(APIView):
                                             password=vd['authorization_code'])
             if user is not None:
                 refresh = RefreshToken.for_user(user)
-                return Response({'access': str(refresh.access_token),'refresh': str(refresh)},
+                return Response({'access': str(refresh.access_token), 'refresh': str(refresh)},
                                 status=status.HTTP_200_OK)
         raise ValidationError('Your phone number or authorization code are incorrect')
-
-
 
 
 class UserRetrieveAPIView(RetrieveAPIView):
