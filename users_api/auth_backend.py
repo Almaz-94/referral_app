@@ -7,7 +7,7 @@ class PhoneAuth:
     """ Authorization backend class for custom user authentication """
     def authenticate(self, request, username=None, password=None):
         try:
-            user = User.objects.get(phone_number=username)
+            user = User.objects.get(phone_number=username, authorization_code=password)
             return user
         except User.DoesNotExist:
             return None

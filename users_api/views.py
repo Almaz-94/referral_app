@@ -44,6 +44,8 @@ class UserCreateAPIView(CreateAPIView):
                         'authorization_code': existing_user.authorization_code}
         else:
             response = super().create(request, *args, **kwargs).data
+            user_id = User.objects.get(phone_number=request.data.get('phone_number')).pk
+            response.update({'user_id': user_id})
         time.sleep(2)
         return Response({'message': 'Proceed to http://localhost:8000/api/users/token/ '
                                     'Your authorization code is sent via message to your phone_number. ',
