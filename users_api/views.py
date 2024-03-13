@@ -1,3 +1,4 @@
+import os
 import string
 import random
 import time
@@ -47,7 +48,7 @@ class UserCreateAPIView(CreateAPIView):
             user_id = User.objects.get(phone_number=request.data.get('phone_number')).pk
             response.update({'user_id': user_id})
         time.sleep(2)
-        return Response({'message': 'Proceed to http://localhost:8000/api/users/token/ '
+        return Response({'message': f'Proceed to {os.getenv("IP_ADDRESS")}/api/users/token/ '
                                     'Your authorization code is sent via message to your phone_number. ',
                          'authorization details': response})
 
