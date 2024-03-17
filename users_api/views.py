@@ -16,6 +16,7 @@ from users_api.models import User
 from users_api.permissions import IsOwner
 from users_api.serializers import UserSerializer, UserProfileSerializer, \
     UserUpdateSerializer, UserLoginSerializer
+from users_api.services import generate_invite_code
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -25,12 +26,7 @@ class UserCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         """ Upon creation gives User authorization_code and  unique invite_code """
         instance = serializer.save()
-        invite_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        duplicate = User.objects.filter(invite_code=invite_code).exists()
-        while duplicate:
-            invite_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-            duplicate = User.objects.filter(invite_code=invite_code).exists()
-        instance.invite_code = invite_code
+        instance.invite_code = generate_invite_code()
         instance.authorization_code = random.randint(1000, 9999)
         instance.save()
 
@@ -81,17 +77,11 @@ class UserUpdateAPIView(UpdateAPIView):
     """ View for updating user's referral code in his profile """
     serializer_class = UserUpdateSerializer
     queryset = User.objects.all()
-    permission_classes = [IsOwner]
+    permission_classes = [IsOwner, IsAuthenticated, ]
 
     def perform_update(self, serializer):
-        """ User cannot enter referral code twice """
+        """ Set user's referral code and pk of his referrer """
         instance = self.get_object()
-        if instance.referral_code:
-            message = {'message': 'You cannot change your referral code twice'}
-            raise ValidationError(message)
-        elif instance.invite_code == self.request.data.get("referral_code"):
-            message = {'message': 'You cannot set your invite code as your referral code'}
-            raise ValidationError(message)
         instance.referred_by = User.objects.get(invite_code=self.request.data.get("referral_code"))
         instance.referral_code = self.request.data.get("referral_code")
         instance.save()

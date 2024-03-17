@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -48,4 +49,18 @@ class UserUpdateSerializer(ModelSerializer):
         model = User
         fields = ['referral_code']
         validators = [ReferralCodeValidator('referral_code'), ]
+
+    def validate_referral_code(self, value):
+        """
+        Validate that User doesn't already have a referral_code and
+        can't enter his invite_code as referral
+        """
+        if self.instance.referral_code:
+            message = {'message': 'You cannot change your referral code twice'}
+            raise ValidationError(message)
+
+        if self.instance.invite_code == value:
+            message = {'message': 'You cannot set your invite code as your referral code'}
+            raise ValidationError(message)
+        return value
 
